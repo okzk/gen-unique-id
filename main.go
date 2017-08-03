@@ -19,8 +19,8 @@ import (
 
 type Config struct {
 	Table string `required:"true"`
-	MinID int    `required:"true" split_words:"true"`
-	MaxID int    `required:"true" split_words:"true"`
+	MinID int    `split_words:"true" default:"0"`
+	MaxID int    `split_words:"true" default:"1023"`
 	TTL   int    `default:"600"`
 }
 
