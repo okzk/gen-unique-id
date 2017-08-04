@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/google/uuid"
@@ -31,9 +32,16 @@ func main() {
 		log.Fatalf("[FATAL] %v", err)
 	}
 
-	svc := dynamodb.New(session.Must(session.NewSessionWithOptions(session.Options{
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
-	})))
+	}))
+	if *sess.Config.Region == "" {
+		region, err := ec2metadata.New(sess).Region()
+		if err == nil {
+			sess.Config.Region = aws.String(region)
+		}
+	}
+	svc := dynamodb.New(sess)
 
 	u := uuid.New()
 	log.Printf("[INFO] uuid: %v", u)
